@@ -16,8 +16,12 @@ public class Resume {
     private Long id;
     private String fileName;
     private String filePath;
-    private String uploadedAt;
-    private String customer;
+    private LocalDateTime uploadedAt;
+
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @Column(length=100000)
     private String extractedText;
