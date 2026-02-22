@@ -1,5 +1,6 @@
 package com.resume.ResumeMatcher.service;
 
+import com.resume.ResumeMatcher.model.JobDescription;
 import com.resume.ResumeMatcher.model.Resume;
 import com.resume.ResumeMatcher.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
 
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
+
+    private final AiService aiService;
 
 
     public Resume uploadResume(MultipartFile file) throws IOException {
@@ -48,27 +51,23 @@ public class ResumeService {
         }
     }
 
-    public int calculateMatchScore(String resumeText, String jobDescription){
+    public String matchScore(Long resumeId, String jobDescription){
 
-        String[] jdWords = jobDescription.toLowerCase().split("\\W+");
-        resumeText = resumeText.toLowerCase();
+        Resume resume = getResumeById(resumeId);
 
-        int matchCount = 0;
-
-        for(String word: jdWords){
-            if(resumeText.contains(word)){
-                matchCount++;
-            }
-        }
-
-        if(jdWords.length == 0){
-            return 0;
-        }
-
-        return (matchCount * 100) / jdWords.length;
+        return aiService.getMatchAnalysis(resume.getExtractedText(), jobDescription);
     }
 
     public Resume getResumeById(Long resumeId) {
         return resumeRepository.findById(resumeId).orElseThrow(() -> new RuntimeException("Resume not found"));
+    }
+
+    public String optimizeResume(Long resumeId, String jobDescription) {
+        Resume resume = getResumeById(resumeId);
+
+        String resumeText = resume.getExtractedText();
+
+        return aiService.optimizeResume(resumeText, jobDescription);
+
     }
 }
