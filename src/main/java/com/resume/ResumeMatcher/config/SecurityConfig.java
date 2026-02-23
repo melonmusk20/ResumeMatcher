@@ -21,22 +21,21 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
+     private PasswordEncoder passwordEncoder;
+
     public SecurityConfig(JwtAuthFilter jwtAuthFilter,
                           CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
   
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+public DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider =
             new DaoAuthenticationProvider(customUserDetailsService);
-    authProvider.setPasswordEncoder(passwordEncoder());
+    authProvider.setPasswordEncoder(passwordEncoder);
     return authProvider;
 }
 
